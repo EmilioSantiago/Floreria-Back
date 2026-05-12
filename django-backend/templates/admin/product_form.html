@@ -1,0 +1,67 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}
+    {% if object %}Editar Producto: {{ object.name }}{% else %}Nuevo Producto{% endif %}
+{% endblock %}
+
+{% block admin_content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>{{ form.name.label }}</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div class="form-group">
+                <label>{{ form.category.label }}</label>
+                {{ form.category }}
+                {{ form.category.errors }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.description.label }}</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+
+        <div class="grid-3" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>{{ form.price.label }}</label>
+                {{ form.price }}
+                {{ form.price.errors }}
+            </div>
+            <div class="form-group">
+                <label>{{ form.stock.label }}</label>
+                {{ form.stock }}
+                {{ form.stock.errors }}
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px; padding-top: 30px;">
+                {{ form.is_active }}
+                <label style="margin-bottom: 0;">{{ form.is_active.label }}</label>
+            </div>
+        </div>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>{{ form.image.label }} (Archivo)</label>
+                {{ form.image }}
+                {{ form.image.errors }}
+            </div>
+            <div class="form-group">
+                <label>{{ form.image_url.label }} (URL externa)</label>
+                {{ form.image_url }}
+                {{ form.image_url.errors }}
+            </div>
+        </div>
+
+        <div class="actions" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary">Guardar Producto</button>
+            <a href="{% url 'products:admin_product_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

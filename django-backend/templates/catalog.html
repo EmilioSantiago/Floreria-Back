@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo - Florería Chelito{% endblock %}
+
+{% block content %}
+<section class="catalog-section">
+    <div class="container">
+        <h1>Catálogo de Productos</h1>
+        
+        <div class="catalog-container">
+            <aside class="filters-sidebar">
+                <h3>Filtrar por Categoría</h3>
+                <div class="filter-group">
+                    <label class="filter-item">
+                        <input type="radio" name="category" value="" checked onchange="filterProducts()">
+                        Todos
+                    </label>
+                    {% for category in categories %}
+                    <label class="filter-item">
+                        <input type="radio" name="category" value="{{ category.id }}" onchange="filterProducts()">
+                        {{ category.name }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </aside>
+
+            <div class="products-section">
+                <div class="products-grid" id="products-grid">
+                    {% for product in products %}
+                    <div class="product-card" data-product-id="{{ product.id }}" data-category-id="{{ product.category.id }}">
+                        <div class="product-image">
+                            <img src="{{ product.get_image_url }}" alt="{{ product.name }}" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                        </div>
+                        <div class="product-info">
+                            <h3>{{ product.name }}</h3>
+                            <p class="category">{{ product.category.name }}</p>
+                            <p class="description">{{ product.description|truncatewords:15 }}</p>
+                            <div class="product-footer">
+                                <span class="price">${{ product.price }}</span>
+                                <div class="button-group">
+                                    <a href="/product/{{ product.id }}/" class="btn-view">Ver</a>
+                                    {% if product.in_stock %}
+                                    <button class="btn-add-cart" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                                        Agregar
+                                    </button>
+                                    {% else %}
+                                    <button class="btn-add-cart" disabled>Sin stock</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No hay productos disponibles</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterProducts() {
+    const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+    const cards = document.querySelectorAll('.product-card');
+    
+    cards.forEach(card => {
+        const categoryId = card.getAttribute('data-category-id');
+        if (selectedCategory === '' || categoryId === selectedCategory) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

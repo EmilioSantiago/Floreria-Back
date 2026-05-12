@@ -1,0 +1,75 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}Dashboard General{% endblock %}
+
+{% block admin_content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Productos</h3>
+        <div class="value">{{ total_products }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Pedidos Totales</h3>
+        <div class="value">{{ total_orders }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Ventas Totales</h3>
+        <div class="value">${{ total_sales|stringformat:".2f" }}</div>
+    </div>
+</div>
+
+<div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="card">
+        <h3>Últimos Pedidos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>${{ order.total }}</td>
+                    <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No hay pedidos recientes.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top: 15px;">
+            <a href="{% url 'products:admin_order_list' %}" class="btn-sm btn-secondary">Ver todos los pedidos</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Alerta de Stock Bajo</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Stock</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock_products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td style="color: red; font-weight: bold;">{{ product.stock }}</td>
+                    <td><a href="{% url 'products:admin_product_edit' product.id %}" class="btn-sm btn-primary">Editar</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">Todo el stock está bien.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido Confirmado - Florería Chelito{% endblock %}
+
+{% block content %}
+<section class="confirmation-section">
+    <div class="container text-center">
+        <div class="confirmation-card">
+            <span class="success-icon">✅</span>
+            <h1>¡Gracias por tu compra!</h1>
+            <p>Tu pedido ha sido recibido y está siendo procesado.</p>
+            
+            {% if order_id %}
+            <div class="order-info">
+                <p><strong>Número de Pedido:</strong> {{ order_id }}</p>
+            </div>
+            {% endif %}
+
+            <p>Te hemos enviado un correo electrónico con los detalles de tu compra.</p>
+            
+            <div class="actions">
+                <a href="/" class="btn btn-primary">Volver al Inicio</a>
+                <a href="/catalog/" class="btn btn-secondary">Seguir Comprando</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.confirmation-section {
+    padding: 80px 0;
+}
+.confirmation-card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+.success-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 20px;
+}
+.order-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #4CAF50;
+}
+.actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+.text-center {
+    text-align: center;
+}
+</style>
+{% endblock %}

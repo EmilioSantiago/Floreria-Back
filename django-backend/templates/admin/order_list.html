@@ -1,0 +1,50 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}Gestión de Pedidos{% endblock %}
+
+{% block admin_content %}
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Orden #</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Ciudad</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.id }}</strong></td>
+                <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ order.customer_name }}</td>
+                <td>{{ order.city }}</td>
+                <td>${{ order.total }}</td>
+                <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                <td>
+                    <a href="{% url 'products:admin_order_detail' order.id %}" class="btn-sm btn-primary">Ver Detalle</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No se encontraron pedidos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+    <div class="pagination" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn-sm btn-secondary">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn-sm btn-secondary">Siguiente</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

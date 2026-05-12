@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Florería Chelito{% endblock %}
+
+{% block content %}
+<section class="product-detail-section">
+    <div class="container">
+        <a href="/catalog/" class="breadcrumb">&larr; Volver al catálogo</a>
+        
+        <div class="product-detail-container">
+            <div class="product-image-large">
+                <img src="{{ product.get_image_url }}" alt="{{ product.name }}" onerror="this.src='https://via.placeholder.com/400?text=Error'">
+            </div>
+
+            <div class="product-details">
+                <h1>{{ product.name }}</h1>
+                <p class="category">Categoría: {{ product.category.name }}</p>
+                
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                    <span class="reviews">(5 reseñas)</span>
+                </div>
+
+                <div class="price-section">
+                    <h2 class="price">${{ product.price }}</h2>
+                    {% if product.in_stock %}
+                    <p class="in-stock">✓ En stock ({{ product.stock }} disponibles)</p>
+                    {% else %}
+                    <p class="out-of-stock">✗ Sin stock</p>
+                    {% endif %}
+                </div>
+
+                <div class="description">
+                    <h3>Descripción</h3>
+                    <p>{{ product.description }}</p>
+                </div>
+
+                {% if product.in_stock %}
+                <div class="add-to-cart-section">
+                    <div class="quantity-selector">
+                        <label for="quantity">Cantidad:</label>
+                        <div class="quantity-controls">
+                            <button id="qty-minus" onclick="decreaseQty()">-</button>
+                            <input type="number" id="quantity" value="1" min="1" max="{{ product.stock }}">
+                            <button id="qty-plus" onclick="increaseQty()">+</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addToCartDetail({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                        🛒 Agregar al Carrito
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if related_products %}
+        <section class="related-products">
+            <h2>Productos Relacionados</h2>
+            <div class="products-grid">
+                {% for related in related_products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="{{ related.get_image_url }}" alt="{{ related.name }}" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ related.name }}</h3>
+                        <p class="price">${{ related.price }}</p>
+                        <a href="/product/{{ related.id }}/" class="btn-view">Ver</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function increaseQty() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decreaseQty() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+
+function addToCartDetail(productId, productName, price) {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    addToCart(productId, productName, price, quantity);
+}
+</script>
+{% endblock %}

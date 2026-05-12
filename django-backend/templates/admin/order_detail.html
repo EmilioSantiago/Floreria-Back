@@ -1,0 +1,63 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}Detalle de Pedido #{{ order.id }}{% endblock %}
+
+{% block admin_content %}
+<div class="grid-2" style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    <div class="card">
+        <h3>Productos en el Pedido</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>${{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.get_subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right; font-weight: bold;">TOTAL:</td>
+                    <td style="font-weight: bold; color: var(--admin-accent); font-size: 1.2rem;">${{ order.total }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Estado del Pedido</h3>
+        <form action="{% url 'products:update_order_status' order.id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <select name="status" class="form-control">
+                    {% for val, label in order.STATUS_CHOICES %}
+                    <option value="{{ val }}" {% if order.status == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Actualizar Estado</button>
+        </form>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+        <h3>Información del Cliente</h3>
+        <p><strong>Nombre:</strong> {{ order.customer_name }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+        <p><strong>Teléfono:</strong> {{ order.phone }}</p>
+        
+        <h3 style="margin-top: 20px;">Dirección de Entrega</h3>
+        <p>{{ order.address }}</p>
+        <p>{{ order.city }}, {{ order.postal_code }}</p>
+    </div>
+</div>
+{% endblock %}

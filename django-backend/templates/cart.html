@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carrito - Florería Chelito{% endblock %}
+
+{% block content %}
+<section class="cart-section">
+    <div class="container">
+        <h1>Tu Carrito de Compras</h1>
+
+        <div class="cart-container">
+            <div class="cart-items" id="cart-items">
+                <p class="empty-cart">Tu carrito está vacío</p>
+            </div>
+
+            <aside class="cart-summary">
+                <div class="summary-card">
+                    <h2>Resumen de Compra</h2>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Envío:</span>
+                        <span id="shipping">$10.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Impuestos:</span>
+                        <span id="taxes">$0.00</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="total">$0.00</span>
+                    </div>
+
+                    <button class="btn btn-primary" id="checkout-btn" onclick="proceedToCheckout()">
+                        Proceder a Pagar
+                    </button>
+
+                    <a href="/catalog/" class="btn btn-secondary">
+                        Continuar Comprando
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<!-- Checkout Modal -->
+<div id="checkout-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeCheckoutModal()">&times;</span>
+        <h2>Completar Compra</h2>
+
+        <form id="checkout-form" onsubmit="submitCheckout(event)">
+            <fieldset>
+                <legend>Información de Contacto</legend>
+                <input type="text" name="name" placeholder="Nombre Completo" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Teléfono" required>
+            </fieldset>
+
+            <fieldset>
+                <legend>Dirección de Envío</legend>
+                <input type="text" name="address" placeholder="Dirección" required>
+                <input type="text" name="city" placeholder="Ciudad" required>
+                <input type="text" name="postal_code" placeholder="Código Postal" required>
+            </fieldset>
+
+            <fieldset>
+                <legend>Método de Pago</legend>
+                <label>
+                    <input type="radio" name="payment_method" value="credit_card" checked>
+                    Tarjeta de Crédito/Débito
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="bank_transfer">
+                    Transferencia Bancaria
+                </label>
+                <label>
+                    <input type="radio" name="payment_method" value="cash">
+                    Pago en Efectivo
+                </label>
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ui.js' %}"></script>
+<script>
+// Cart display functions will be added here
+</script>
+{% endblock %}

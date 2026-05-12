@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Florería Chelito{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <h1><a href="/">🌸 Florería Chelito</a></h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/catalog/">Catálogo</a></li>
+                <li><a href="/contact/">Contacto</a></li>
+                <li><a href="/cart/">
+                    <span class="cart-icon">🛒 Carrito</span>
+                    <span class="cart-count" id="cart-count">0</span>
+                </a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'products:dashboard' %}" class="btn-nav-admin">Dashboard</a></li>
+                <li><form action="{% url 'products:logout' %}" method="post" style="display:inline;">{% csrf_token %}<button type="submit" class="btn-logout">Salir</button></form></li>
+                {% else %}
+                <li><a href="{% url 'products:login' %}" class="btn-login">Iniciar sesión</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Florería Chelito. Desde 1975.</p>
+            <p>Flores frescas para tus momentos especiales.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/api-client.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

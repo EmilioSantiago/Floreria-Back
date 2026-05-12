@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Florería Chelito{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-content">
+        <h1>Bienvenido a Florería Chelito</h1>
+        <p>Las flores más frescas y hermosas para tus momentos especiales</p>
+        <a href="/catalog/" class="btn btn-primary">Ver Catálogo</a>
+    </div>
+</section>
+
+<section class="featured-section">
+    <div class="container">
+        <h2>Productos Destacados</h2>
+        <div class="products-grid">
+            {% for product in featured_products %}
+            <div class="product-card" data-product-id="{{ product.id }}">
+                <div class="product-image">
+                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                </div>
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <p class="category">{{ product.category.name }}</p>
+                    <p class="description">{{ product.description|truncatewords:10 }}</p>
+                    <div class="product-footer">
+                        <span class="price">${{ product.price }}</span>
+                        {% if product.in_stock %}
+                        <button class="btn-add-cart" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                            Agregar
+                        </button>
+                        {% else %}
+                        <button class="btn-add-cart" disabled>Sin stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No hay productos disponibles</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="info-section">
+    <div class="container">
+        <div class="info-cards">
+            <div class="info-card">
+                <h3>🚚 Envío Rápido</h3>
+                <p>Entrega en 24 horas a tu domicilio</p>
+            </div>
+            <div class="info-card">
+                <h3>💰 Precios Justos</h3>
+                <p>Los mejores precios del mercado</p>
+            </div>
+            <div class="info-card">
+                <h3>🌟 Calidad Premium</h3>
+                <p>Flores frescas y de primera calidad</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

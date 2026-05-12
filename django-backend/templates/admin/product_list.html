@@ -1,0 +1,67 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}Gestión de Productos{% endblock %}
+
+{% block admin_content %}
+<div class="card">
+    <div class="header-actions">
+        <form method="get" class="search-form" style="display: flex; gap: 10px;">
+            <input type="text" name="search" placeholder="Buscar producto..." value="{{ request.GET.search }}" class="form-control" style="margin-bottom: 0; width: 300px;">
+            <button type="submit" class="btn btn-secondary">Buscar</button>
+        </form>
+        <a href="{% url 'products:admin_product_add' %}" class="btn btn-primary">+ Nuevo Producto</a>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td><img src="{{ product.get_image_url }}" alt="{{ product.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td>
+                <td><strong>{{ product.name }}</strong></td>
+                <td>{{ product.category.name }}</td>
+                <td>${{ product.price }}</td>
+                <td>{{ product.stock }}</td>
+                <td>
+                    {% if product.is_active %}
+                    <span class="badge" style="background: #e1f5fe; color: #01579b;">Activo</span>
+                    {% else %}
+                    <span class="badge" style="background: #ffebee; color: #b71c1c;">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="button-group">
+                        <a href="{% url 'products:admin_product_edit' product.id %}" class="btn-sm btn-primary">Editar</a>
+                        <a href="{% url 'products:admin_product_delete' product.id %}" class="btn-sm btn-secondary" style="border-color: #e74c3c; color: #e74c3c;">Eliminar</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No se encontraron productos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+    <div class="pagination" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="btn-sm btn-secondary">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="btn-sm btn-secondary">Siguiente</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
