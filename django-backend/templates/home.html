@@ -1,14 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}Inicio - Florería Chelito{% endblock %}
+{% block title %}Inicio - Florer&iacute;a Chelito{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="container hero-content">
-        <h1>Bienvenido a Florería Chelito</h1>
-        <p>Las flores más frescas y hermosas para tus momentos especiales</p>
-        <a href="/catalog/" class="btn btn-primary">Ver Catálogo</a>
+<section class="home-carousel" aria-label="Promociones de Floreria Chelito">
+    <div class="carousel-track" id="home-carousel-track">
+        {% for product in featured_products|slice:":3" %}
+        <article class="carousel-slide{% if forloop.first %} is-active{% endif %}">
+            <img src="{{ product.get_image_url }}" alt="{{ product.name }}" onerror="this.src='https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1600&q=80'">
+            <div class="carousel-copy">
+                <span class="carousel-kicker">Flores frescas desde 1975</span>
+                <h1>{{ product.name }}</h1>
+                <p>{{ product.description|truncatewords:16 }}</p>
+                <a href="/product/{{ product.id }}/" class="btn btn-primary">Ver detalle</a>
+            </div>
+        </article>
+        {% empty %}
+        <article class="carousel-slide is-active">
+            <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1600&q=80" alt="Arreglo floral colorido">
+            <div class="carousel-copy">
+                <span class="carousel-kicker">Flores frescas desde 1975</span>
+                <h1>Florer&iacute;a Chelito</h1>
+                <p>Ramos, arreglos y detalles hechos para acompa&ntilde;ar tus momentos especiales.</p>
+                <a href="/catalog/" class="btn btn-primary">Ver cat&aacute;logo</a>
+            </div>
+        </article>
+        <article class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=1600&q=80" alt="Ramo de flores rosas">
+            <div class="carousel-copy">
+                <span class="carousel-kicker">Detalles con intenci&oacute;n</span>
+                <h1>Arreglos para celebrar</h1>
+                <p>Dise&ntilde;os florales para cumplea&ntilde;os, aniversarios y regalos inesperados.</p>
+                <a href="/catalog/" class="btn btn-primary">Elegir flores</a>
+            </div>
+        </article>
+        <article class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1487070183336-b863922373d4?auto=format&fit=crop&w=1600&q=80" alt="Flores frescas sobre mesa">
+            <div class="carousel-copy">
+                <span class="carousel-kicker">Entrega local</span>
+                <h1>Un gesto que llega bonito</h1>
+                <p>Pedidos preparados con cuidado y listos para sorprender.</p>
+                <a href="/contact/" class="btn btn-primary">Contactar</a>
+            </div>
+        </article>
+        {% endfor %}
     </div>
+
+    <button class="carousel-control prev" type="button" aria-label="Slide anterior" onclick="moveHomeCarousel(-1)">&#8249;</button>
+    <button class="carousel-control next" type="button" aria-label="Slide siguiente" onclick="moveHomeCarousel(1)">&#8250;</button>
+    <div class="carousel-dots" id="home-carousel-dots" aria-label="Seleccionar slide"></div>
 </section>
 
 <section class="featured-section">
@@ -27,7 +67,7 @@
                     <div class="product-footer">
                         <span class="price">${{ product.price }}</span>
                         {% if product.in_stock %}
-                        <button class="btn-add-cart" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                        <button class="btn-add-cart" onclick="addToCart({{ product.id }}, '{{ product.name|escapejs }}', {{ product.price }}, 1, '{{ product.get_image_url|escapejs }}')">
                             Agregar
                         </button>
                         {% else %}
@@ -47,18 +87,71 @@
     <div class="container">
         <div class="info-cards">
             <div class="info-card">
-                <h3>🚚 Envío Rápido</h3>
+                <h3>Env&iacute;o r&aacute;pido</h3>
                 <p>Entrega en 24 horas a tu domicilio</p>
             </div>
             <div class="info-card">
-                <h3>💰 Precios Justos</h3>
+                <h3>Precios justos</h3>
                 <p>Los mejores precios del mercado</p>
             </div>
             <div class="info-card">
-                <h3>🌟 Calidad Premium</h3>
+                <h3>Calidad premium</h3>
                 <p>Flores frescas y de primera calidad</p>
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let homeCarouselIndex = 0;
+let homeCarouselTimer = null;
+
+function updateHomeCarousel(index) {
+    const slides = document.querySelectorAll('.home-carousel .carousel-slide');
+    const dots = document.querySelectorAll('.home-carousel .carousel-dot');
+    if (!slides.length) return;
+
+    homeCarouselIndex = (index + slides.length) % slides.length;
+    slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle('is-active', slideIndex === homeCarouselIndex);
+    });
+    dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle('is-active', dotIndex === homeCarouselIndex);
+        dot.setAttribute('aria-current', dotIndex === homeCarouselIndex ? 'true' : 'false');
+    });
+}
+
+function moveHomeCarousel(direction) {
+    updateHomeCarousel(homeCarouselIndex + direction);
+    restartHomeCarouselTimer();
+}
+
+function restartHomeCarouselTimer() {
+    window.clearInterval(homeCarouselTimer);
+    homeCarouselTimer = window.setInterval(() => updateHomeCarousel(homeCarouselIndex + 1), 6000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dotsContainer = document.getElementById('home-carousel-dots');
+    const slides = document.querySelectorAll('.home-carousel .carousel-slide');
+    if (!dotsContainer || slides.length <= 1) return;
+
+    slides.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel-dot';
+        dot.setAttribute('aria-label', `Ir al slide ${index + 1}`);
+        dot.addEventListener('click', () => {
+            updateHomeCarousel(index);
+            restartHomeCarouselTimer();
+        });
+        dotsContainer.appendChild(dot);
+    });
+
+    updateHomeCarousel(0);
+    restartHomeCarouselTimer();
+});
+</script>
 {% endblock %}

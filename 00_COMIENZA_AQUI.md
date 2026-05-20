@@ -166,6 +166,7 @@ EXIT;
 ```
 DEBUG=True
 SECRET_KEY=your-secret-key-here
+DB_ENGINE=django.db.backends.mysql
 DB_USER=floreria_user
 DB_PASSWORD=password123
 DB_NAME=floreria_db
@@ -186,7 +187,9 @@ DB_NAME=floreria_db
 
 ```bash
 cd django-backend
-venv\Scripts\activate
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
 # Ingresar: usuario, email, contraseña
@@ -197,13 +200,14 @@ python manage.py createsuperuser
 **Terminal 1 - Django:**
 ```bash
 cd django-backend
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 python manage.py runserver 8000
 ```
 
 **Terminal 2 - Express:**
 ```bash
 cd express-backend
+npm install
 npm start
 ```
 

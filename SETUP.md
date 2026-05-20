@@ -147,7 +147,7 @@ CORS_ORIGIN=http://localhost:8000
 
 ```bash
 cd django-backend
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 python manage.py migrate
 python manage.py createsuperuser
 ```
@@ -157,7 +157,7 @@ python manage.py createsuperuser
 **Terminal 1:**
 ```bash
 cd django-backend
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 python manage.py runserver 8000
 ```
 

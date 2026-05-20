@@ -64,7 +64,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:8000,http://localhost:3001
 cd django-backend
 
 # Activar entorno virtual (si no está activado)
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 
 # Instalar dependencias
 pip install -r requirements.txt
@@ -128,7 +128,7 @@ npm install
 
 ```bash
 cd django-backend
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 python manage.py runserver 8000
 ```
 
@@ -160,7 +160,7 @@ $djangoPath = "c:\Users\emili\OneDrive\Desktop\Floreria-Back\django-backend"
 $expressPath = "c:\Users\emili\OneDrive\Desktop\Floreria-Back\express-backend"
 
 # Abrir Django en nueva ventana
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$djangoPath'; .\venv\Scripts\activate; python manage.py runserver 8000"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$djangoPath'; .\venv\Scripts\Activate.ps1; python manage.py runserver 8000"
 
 # Esperar 2 segundos
 Start-Sleep -Seconds 2

@@ -40,7 +40,7 @@
                                 <div class="button-group">
                                     <a href="/product/{{ product.id }}/" class="btn-view">Ver</a>
                                     {% if product.in_stock %}
-                                    <button class="btn-add-cart" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                                    <button class="btn-add-cart" onclick="addToCart({{ product.id }}, '{{ product.name|escapejs }}', {{ product.price }}, 1, '{{ product.get_image_url|escapejs }}')">
                                         Agregar
                                     </button>
                                     {% else %}

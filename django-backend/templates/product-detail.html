@@ -45,7 +45,7 @@
                             <button id="qty-plus" onclick="increaseQty()">+</button>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="addToCartDetail({{ product.id }}, '{{ product.name }}', {{ product.price }})">
+                    <button class="btn btn-primary" onclick="addToCartDetail({{ product.id }}, '{{ product.name|escapejs }}', {{ product.price }}, '{{ product.get_image_url|escapejs }}')">
                         🛒 Agregar al Carrito
                     </button>
                 </div>
@@ -90,9 +90,9 @@ function decreaseQty() {
     }
 }
 
-function addToCartDetail(productId, productName, price) {
+function addToCartDetail(productId, productName, price, imageUrl) {
     const quantity = parseInt(document.getElementById('quantity').value);
-    addToCart(productId, productName, price, quantity);
+    addToCart(productId, productName, price, quantity, imageUrl);
 }
 </script>
 {% endblock %}

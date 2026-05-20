@@ -1,26 +1,47 @@
 {% extends 'base.html' %}
 
-{% block title %}Pedido Confirmado - Florería Chelito{% endblock %}
+{% block title %}Pedido Confirmado - Florer&iacute;a Chelito{% endblock %}
 
 {% block content %}
 <section class="confirmation-section">
     <div class="container text-center">
         <div class="confirmation-card">
-            <span class="success-icon">✅</span>
-            <h1>¡Gracias por tu compra!</h1>
-            <p>Tu pedido ha sido recibido y está siendo procesado.</p>
-            
+            {% if payment_status == 'paid' %}
+            <span class="success-icon">OK</span>
+            <h1>&iexcl;Pago aprobado!</h1>
+            <p>Tu pedido fue recibido y el pago se confirm&oacute; correctamente con Mercado Pago.</p>
+            {% elif payment_result == 'failure' or payment_status == 'payment_failed' %}
+            <span class="success-icon">!</span>
+            <h1>Pago no aprobado</h1>
+            <p>Mercado Pago no pudo aprobar la operaci&oacute;n. Puedes intentar nuevamente desde el carrito.</p>
+            {% elif payment_result == 'pending' or payment_status == 'pending_payment' %}
+            <span class="success-icon">...</span>
+            <h1>Pago pendiente</h1>
+            <p>Tu pedido fue recibido y el pago sigue en revisi&oacute;n.</p>
+            {% else %}
+            <span class="success-icon">OK</span>
+            <h1>&iexcl;Gracias por tu compra!</h1>
+            <p>Tu pedido ha sido recibido y est&aacute; siendo procesado.</p>
+            {% endif %}
+
             {% if order_id %}
             <div class="order-info">
-                <p><strong>Número de Pedido:</strong> {{ order_id }}</p>
+                <p><strong>N&uacute;mero de Pedido:</strong> {{ order_id }}</p>
+                {% if payment_id %}
+                <p><strong>ID de Pago:</strong> {{ payment_id }}</p>
+                {% endif %}
+                {% if payment_message %}
+                <p><strong>Estado Mercado Pago:</strong> {{ payment_message }}</p>
+                {% endif %}
             </div>
             {% endif %}
 
-            <p>Te hemos enviado un correo electrónico con los detalles de tu compra.</p>
-            
             <div class="actions">
                 <a href="/" class="btn btn-primary">Volver al Inicio</a>
                 <a href="/catalog/" class="btn btn-secondary">Seguir Comprando</a>
+                {% if payment_result == 'failure' or payment_status == 'payment_failed' %}
+                <a href="/cart/" class="btn btn-secondary">Intentar de nuevo</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -35,13 +56,20 @@
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    max-width: 600px;
+    max-width: 680px;
     margin: 0 auto;
 }
 .success-icon {
-    font-size: 64px;
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    min-height: 64px;
     margin-bottom: 20px;
+    border-radius: 999px;
+    background: #f4ece7;
+    color: #bd3f5e;
+    font-weight: 800;
 }
 .order-info {
     background: #f8f9fa;
@@ -53,6 +81,7 @@
 .actions {
     margin-top: 30px;
     display: flex;
+    flex-wrap: wrap;
     gap: 15px;
     justify-content: center;
 }
@@ -60,4 +89,10 @@
     text-align: center;
 }
 </style>
+
+{% if clear_cart %}
+<script>
+localStorage.removeItem('floreria_cart');
+</script>
+{% endif %}
 {% endblock %}

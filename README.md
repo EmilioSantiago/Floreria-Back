@@ -39,7 +39,7 @@ cd django-backend
 
 # Crear entorno virtual (Windows)
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 
 # O en macOS/Linux
 python3 -m venv venv
@@ -88,7 +88,7 @@ python manage.py createsuperuser
 ```bash
 cd django-backend
 # Activar entorno virtual
-venv\Scripts\activate  # Windows
+.\venv\Scripts\Activate.ps1  # Windows PowerShell
 # o
 source venv/bin/activate  # macOS/Linux
 

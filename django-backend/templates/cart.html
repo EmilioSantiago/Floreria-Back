@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Carrito - Florería Chelito{% endblock %}
+{% block title %}Carrito - Florer&iacute;a Chelito{% endblock %}
 
 {% block content %}
 <section class="cart-section">
@@ -10,19 +10,19 @@
 
         <div class="cart-container">
             <div class="cart-items" id="cart-items">
-                <p class="empty-cart">Tu carrito está vacío</p>
+                <p class="empty-cart">Tu carrito est&aacute; vac&iacute;o</p>
             </div>
 
             <aside class="cart-summary">
                 <div class="summary-card">
                     <h2>Resumen de Compra</h2>
-                    
+
                     <div class="summary-row">
                         <span>Subtotal:</span>
                         <span id="subtotal">$0.00</span>
                     </div>
                     <div class="summary-row">
-                        <span>Envío:</span>
+                        <span>Env&iacute;o:</span>
                         <span id="shipping">$10.00</span>
                     </div>
                     <div class="summary-row">
@@ -50,44 +50,75 @@
     </div>
 </section>
 
-<!-- Checkout Modal -->
 <div id="checkout-modal" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close" onclick="closeCheckoutModal()">&times;</span>
-        <h2>Completar Compra</h2>
+        <div class="modal-header">
+            <div>
+                <span class="modal-kicker">Pedido seguro</span>
+                <h2>Completar Compra</h2>
+            </div>
+            <button class="close" type="button" onclick="closeCheckoutModal()" aria-label="Cerrar">&times;</button>
+        </div>
 
         <form id="checkout-form" onsubmit="submitCheckout(event)">
             <fieldset>
-                <legend>Información de Contacto</legend>
-                <input type="text" name="name" placeholder="Nombre Completo" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="tel" name="phone" placeholder="Teléfono" required>
+                <legend>Informaci&oacute;n de Contacto</legend>
+                <div class="modal-form-grid">
+                    <label>
+                        <span>Nombre completo</span>
+                        <input type="text" name="name" placeholder="Emilio Garcia" required>
+                    </label>
+                    <label>
+                        <span>Email</span>
+                        <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+                    </label>
+                    <label>
+                        <span>Tel&eacute;fono</span>
+                        <input type="tel" name="phone" placeholder="951 000 0000" required>
+                    </label>
+                </div>
             </fieldset>
 
             <fieldset>
-                <legend>Dirección de Envío</legend>
-                <input type="text" name="address" placeholder="Dirección" required>
-                <input type="text" name="city" placeholder="Ciudad" required>
-                <input type="text" name="postal_code" placeholder="Código Postal" required>
+                <legend>Direcci&oacute;n de Env&iacute;o</legend>
+                <div class="modal-form-grid">
+                    <label class="full-width">
+                        <span>Direcci&oacute;n</span>
+                        <input type="text" name="address" placeholder="Calle, numero y colonia" required>
+                    </label>
+                    <label>
+                        <span>Ciudad</span>
+                        <input type="text" name="city" placeholder="Oaxaca de Juarez" required>
+                    </label>
+                    <label>
+                        <span>C&oacute;digo postal</span>
+                        <input type="text" name="postal_code" placeholder="68000" required>
+                    </label>
+                </div>
             </fieldset>
 
             <fieldset>
-                <legend>Método de Pago</legend>
-                <label>
-                    <input type="radio" name="payment_method" value="credit_card" checked>
-                    Tarjeta de Crédito/Débito
-                </label>
-                <label>
-                    <input type="radio" name="payment_method" value="bank_transfer">
-                    Transferencia Bancaria
-                </label>
-                <label>
-                    <input type="radio" name="payment_method" value="cash">
-                    Pago en Efectivo
-                </label>
+                <legend>M&eacute;todo de Pago</legend>
+                <div class="payment-options">
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="mercado_pago" checked>
+                        <span>Tarjeta en l&iacute;nea con Mercado Pago</span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="bank_transfer">
+                        <span>Transferencia bancaria</span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="cash">
+                        <span>Pago en efectivo</span>
+                    </label>
+                </div>
             </fieldset>
 
-            <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeCheckoutModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
+            </div>
         </form>
     </div>
 </div>
@@ -95,7 +126,4 @@
 
 {% block extra_js %}
 <script src="{% static 'js/ui.js' %}"></script>
-<script>
-// Cart display functions will be added here
-</script>
 {% endblock %}

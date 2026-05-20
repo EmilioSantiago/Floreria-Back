@@ -2,8 +2,17 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // Update cart count on page load
-    const cart = JSON.parse(localStorage.getItem('floreria_cart') || '[]');
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    let cart = [];
+    try {
+        const storedCart = JSON.parse(localStorage.getItem('floreria_cart') || '[]');
+        cart = Array.isArray(storedCart) ? storedCart : [];
+    } catch (error) {
+        cart = [];
+    }
+    const count = cart.reduce((sum, item) => {
+        const quantity = Number.parseInt(item.quantity, 10);
+        return Number.isInteger(quantity) && quantity > 0 ? sum + quantity : sum;
+    }, 0);
     const badge = document.getElementById('cart-count');
     if (badge) {
         badge.textContent = count;
