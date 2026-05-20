@@ -191,6 +191,245 @@ class Cart {
 // Global cart instance
 const cart = new Cart();
 
+const DEFAULT_DELIVERY_CENTER = { lat: 17.0732, lng: -96.7266 };
+let deliveryMap;
+let deliveryMarker;
+let deliveryGeocoder;
+let deliveryAutocomplete;
+let deliveryMapReady = false;
+let deliveryMapInitialized = false;
+
+window.gm_authFailure = function gmAuthFailure() {
+    setDeliveryLocationStatus('No se pudo validar la API key de Google Maps.', 'error');
+};
+
+window.initCheckoutMap = function initCheckoutMap() {
+    deliveryMapReady = true;
+    ensureDeliveryMap();
+};
+
+function getDeliveryFields() {
+    return {
+        address: document.querySelector('input[name="address"]'),
+        city: document.querySelector('input[name="city"]'),
+        postalCode: document.querySelector('input[name="postal_code"]'),
+        latitude: document.querySelector('input[name="delivery_latitude"]'),
+        longitude: document.querySelector('input[name="delivery_longitude"]'),
+        search: document.getElementById('delivery-location-search'),
+        status: document.getElementById('delivery-location-status'),
+    };
+}
+
+function setDeliveryLocationStatus(message, type = 'info') {
+    const status = document.getElementById('delivery-location-status');
+    if (!status) return;
+
+    status.textContent = message;
+    status.className = `delivery-location-status ${type}`;
+}
+
+function getAddressComponent(components, type, useShortName = false) {
+    const component = components.find(item => item.types.includes(type));
+    if (!component) return '';
+    return useShortName ? component.short_name : component.long_name;
+}
+
+function parseGoogleAddress(addressComponents = []) {
+    const streetNumber = getAddressComponent(addressComponents, 'street_number');
+    const route = getAddressComponent(addressComponents, 'route');
+    const neighborhood = getAddressComponent(addressComponents, 'neighborhood')
+        || getAddressComponent(addressComponents, 'sublocality_level_1')
+        || getAddressComponent(addressComponents, 'sublocality');
+    const city = getAddressComponent(addressComponents, 'locality')
+        || getAddressComponent(addressComponents, 'administrative_area_level_2')
+        || getAddressComponent(addressComponents, 'administrative_area_level_1');
+    const postalCode = getAddressComponent(addressComponents, 'postal_code');
+    const street = [route, streetNumber].filter(Boolean).join(' ');
+
+    return {
+        address: [street, neighborhood].filter(Boolean).join(', '),
+        city,
+        postalCode,
+    };
+}
+
+function fillDeliveryAddressFromResult(result) {
+    const fields = getDeliveryFields();
+    const parsed = parseGoogleAddress(result.address_components || []);
+    const fallbackAddress = result.formatted_address || '';
+
+    if (fields.address) {
+        fields.address.value = parsed.address || fallbackAddress;
+    }
+
+    if (fields.city && parsed.city) {
+        fields.city.value = parsed.city;
+    }
+
+    if (fields.postalCode && parsed.postalCode) {
+        fields.postalCode.value = parsed.postalCode;
+    }
+
+    if (fields.search && fallbackAddress) {
+        fields.search.value = fallbackAddress;
+    }
+}
+
+function setDeliveryCoordinates(latLng) {
+    const fields = getDeliveryFields();
+    const lat = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
+    const lng = typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng;
+
+    if (fields.latitude) fields.latitude.value = lat.toFixed(7);
+    if (fields.longitude) fields.longitude.value = lng.toFixed(7);
+}
+
+async function reverseGeocodeDeliveryLocation(latLng) {
+    if (!deliveryGeocoder) return;
+
+    setDeliveryLocationStatus('Buscando direccion...', 'info');
+
+    try {
+        const response = await deliveryGeocoder.geocode({
+            location: latLng,
+            region: 'mx',
+        });
+        const result = response.results?.[0];
+        if (!result) {
+            setDeliveryLocationStatus('No encontramos una direccion para este punto.', 'warning');
+            return;
+        }
+
+        fillDeliveryAddressFromResult(result);
+        setDeliveryLocationStatus('Direccion agregada al pedido.', 'success');
+    } catch (error) {
+        console.error('Google Maps geocoding error:', error);
+        setDeliveryLocationStatus('No se pudo obtener la direccion. Puedes escribirla manualmente.', 'error');
+    }
+}
+
+function selectDeliveryLocation(latLng, geocodeResult = null) {
+    if (!deliveryMap || !deliveryMarker) return;
+
+    deliveryMarker.setPosition(latLng);
+    deliveryMap.panTo(latLng);
+    setDeliveryCoordinates(latLng);
+
+    if (geocodeResult) {
+        fillDeliveryAddressFromResult(geocodeResult);
+        setDeliveryLocationStatus('Direccion agregada al pedido.', 'success');
+        return;
+    }
+
+    reverseGeocodeDeliveryLocation(latLng);
+}
+
+function ensureDeliveryMap() {
+    const mapEl = document.getElementById('delivery-map');
+    if (!mapEl) return false;
+
+    if (window.GOOGLE_MAPS_DISABLED) {
+        setDeliveryLocationStatus('Google Maps no tiene API key configurada.', 'error');
+        return false;
+    }
+
+    if (!deliveryMapReady || !window.google?.maps) {
+        setDeliveryLocationStatus('Cargando Google Maps...', 'info');
+        return false;
+    }
+
+    if (deliveryMapInitialized) {
+        google.maps.event.trigger(deliveryMap, 'resize');
+        deliveryMap.setCenter(deliveryMarker.getPosition() || DEFAULT_DELIVERY_CENTER);
+        return true;
+    }
+
+    deliveryGeocoder = new google.maps.Geocoder();
+    deliveryMap = new google.maps.Map(mapEl, {
+        center: DEFAULT_DELIVERY_CENTER,
+        zoom: 14,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+    });
+    deliveryMarker = new google.maps.Marker({
+        position: DEFAULT_DELIVERY_CENTER,
+        map: deliveryMap,
+        draggable: true,
+        title: 'Ubicacion de entrega',
+    });
+
+    deliveryMap.addListener('click', (event) => {
+        selectDeliveryLocation(event.latLng);
+    });
+
+    deliveryMarker.addListener('dragend', (event) => {
+        selectDeliveryLocation(event.latLng);
+    });
+
+    const fields = getDeliveryFields();
+    if (fields.search && google.maps.places?.Autocomplete) {
+        deliveryAutocomplete = new google.maps.places.Autocomplete(fields.search, {
+            componentRestrictions: { country: 'mx' },
+            fields: ['address_components', 'formatted_address', 'geometry'],
+        });
+        deliveryAutocomplete.bindTo('bounds', deliveryMap);
+        deliveryAutocomplete.addListener('place_changed', () => {
+            const place = deliveryAutocomplete.getPlace();
+            if (!place.geometry?.location) {
+                setDeliveryLocationStatus('Selecciona una direccion de la lista.', 'warning');
+                return;
+            }
+
+            if (place.geometry.viewport) {
+                deliveryMap.fitBounds(place.geometry.viewport);
+            } else {
+                deliveryMap.setZoom(16);
+            }
+
+            selectDeliveryLocation(place.geometry.location, place);
+        });
+    }
+
+    const currentLocationButton = document.getElementById('use-current-location');
+    if (currentLocationButton) {
+        currentLocationButton.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                setDeliveryLocationStatus('Tu navegador no permite obtener ubicacion.', 'error');
+                return;
+            }
+
+            currentLocationButton.disabled = true;
+            setDeliveryLocationStatus('Obteniendo ubicacion...', 'info');
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latLng = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    deliveryMap.setZoom(17);
+                    selectDeliveryLocation(latLng);
+                    currentLocationButton.disabled = false;
+                },
+                () => {
+                    setDeliveryLocationStatus('No se pudo usar la ubicacion actual.', 'error');
+                    currentLocationButton.disabled = false;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000,
+                },
+            );
+        });
+    }
+
+    deliveryMapInitialized = true;
+    setDeliveryCoordinates(DEFAULT_DELIVERY_CENTER);
+    setDeliveryLocationStatus('Selecciona un punto en el mapa.', 'info');
+    return true;
+}
+
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, (character) => ({
         '&': '&amp;',
@@ -329,6 +568,7 @@ function proceedToCheckout() {
         return;
     }
     document.getElementById('checkout-modal').style.display = 'flex';
+    ensureDeliveryMap();
 }
 
 function closeCheckoutModal() {
@@ -352,6 +592,8 @@ async function submitCheckout(event) {
         address: document.querySelector('input[name="address"]').value,
         city: document.querySelector('input[name="city"]').value,
         postal_code: document.querySelector('input[name="postal_code"]').value,
+        delivery_latitude: document.querySelector('input[name="delivery_latitude"]')?.value || null,
+        delivery_longitude: document.querySelector('input[name="delivery_longitude"]')?.value || null,
         payment_method: document.querySelector('input[name="payment_method"]:checked').value,
         items: checkoutItems,
         total: cart.getTotal(),

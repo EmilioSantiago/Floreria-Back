@@ -81,6 +81,21 @@
 
             <fieldset>
                 <legend>Direcci&oacute;n de Env&iacute;o</legend>
+                <div class="delivery-map-panel">
+                    <div class="delivery-map-search">
+                        <label class="full-width" for="delivery-location-search">
+                            <span>Ubicaci&oacute;n</span>
+                            <input type="text" id="delivery-location-search" placeholder="Buscar direcci&oacute;n o lugar">
+                        </label>
+                        <button class="btn btn-secondary" type="button" id="use-current-location">
+                            Usar mi ubicaci&oacute;n
+                        </button>
+                    </div>
+                    <div id="delivery-map" class="delivery-map" aria-label="Mapa de ubicaci&oacute;n de entrega"></div>
+                    <p id="delivery-location-status" class="delivery-location-status" aria-live="polite">
+                        Selecciona un punto en el mapa.
+                    </p>
+                </div>
                 <div class="modal-form-grid">
                     <label class="full-width">
                         <span>Direcci&oacute;n</span>
@@ -94,6 +109,8 @@
                         <span>C&oacute;digo postal</span>
                         <input type="text" name="postal_code" placeholder="68000" required>
                     </label>
+                    <input type="hidden" name="delivery_latitude">
+                    <input type="hidden" name="delivery_longitude">
                 </div>
             </fieldset>
 
@@ -126,4 +143,11 @@
 
 {% block extra_js %}
 <script src="{% static 'js/ui.js' %}"></script>
+{% if google_maps_api_key %}
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key|urlencode }}&libraries=places&callback=initCheckoutMap&language=es&region=MX"></script>
+{% else %}
+<script>
+window.GOOGLE_MAPS_DISABLED = true;
+</script>
+{% endif %}
 {% endblock %}

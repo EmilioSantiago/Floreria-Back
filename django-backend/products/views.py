@@ -53,7 +53,8 @@ class CartView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['express_api_url'] = 'http://localhost:3001'
+        context['express_api_url'] = settings.EXPRESS_API_URL
+        context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
         return context
 
 
