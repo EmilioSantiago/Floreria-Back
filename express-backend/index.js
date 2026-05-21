@@ -1,19 +1,24 @@
 const express = require('express');
 const cors = require('cors');
 
+const app = express();
+
 app.use(cors({
   origin: [
     'http://localhost:8000',
     'https://floreria-back-production-0c99.up.railway.app'
   ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env'), override: true });
 
-const app = express();
+
 const PORT = process.env.PORT || 3001;
 const sequelize = require('./config/db');
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:8000,http://127.0.0.1:8000')
