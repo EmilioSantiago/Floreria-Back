@@ -1,6 +1,8 @@
 // API Client - Manejo de peticiones HTTP
 const API_BASE_URL = window.location.origin + '/api';
-const EXPRESS_API_URL = `${window.location.protocol}//${window.location.hostname}:3001`;
+const EXPRESS_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3001'
+    : 'https://TU-DOMINIO-EXPRESS.up.railway.app';
 
 async function apiCall(endpoint, options = {}) {
     const defaults = {
