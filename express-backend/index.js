@@ -1,5 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+
+app.use(cors({
+  origin: [
+    'http://localhost:8000',
+    'https://floreria-back-production-0c99.up.railway.app'
+  ],
+  credentials: true
+}));
 const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
