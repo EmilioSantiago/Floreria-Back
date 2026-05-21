@@ -5,7 +5,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env'), override: t
 const dbConfig = {
     database: process.env.DB_NAME || 'floreria_db',
     username: process.env.DB_USER || 'floreria_user',
-    password: process.env.DB_PASSWORD || 'password123',
+    password: process.env.DB_PASSWORD || '090774',
     host: process.env.DB_HOST || '127.0.0.1',
     port: Number(process.env.DB_PORT || 3306),
 };
