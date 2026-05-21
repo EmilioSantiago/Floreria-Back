@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env'), override: true });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const dbConfig = {
     database: process.env.DB_NAME || 'floreria_db',
