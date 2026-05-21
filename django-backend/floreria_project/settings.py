@@ -140,6 +140,10 @@ REST_FRAMEWORK = {
 # Express Backend URL
 EXPRESS_API_URL = os.getenv('EXPRESS_API_URL', 'http://localhost:3001')
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 # Google Maps
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', '')
