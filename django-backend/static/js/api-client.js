@@ -2,7 +2,7 @@
 const API_BASE_URL = window.location.origin + '/api';
 const EXPRESS_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3001'
-    : 'invigorating-unity-production.up.railway.app';
+    : 'https://invigorating-unity-production.up.railway.app';
 
 async function apiCall(endpoint, options = {}) {
     const defaults = {
