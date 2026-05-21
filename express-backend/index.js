@@ -26,14 +26,11 @@ require('./models/OrderItem');
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-
-        return callback(new Error(`Origin ${origin} is not allowed by CORS`));
-    },
-    credentials: true
+  origin: [
+    'http://localhost:8000',
+    'https://floreria-back-production-0c99.up.railway.app'
+  ],
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
